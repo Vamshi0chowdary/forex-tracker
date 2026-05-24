@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+**/dist/
+
+# Local environment files
+.env
+**/.env
+
+# Python virtual environments
+.venv/
+**/.venv/
+
+# Editor and OS files
+.DS_Store
+Thumbs.db
