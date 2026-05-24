@@ -200,6 +200,48 @@ If there were a **$5/day premium API budget**, I would use it selectively:
 
 ---
 
+## 🚀 Deploying everything to Vercel (single place)
+
+This repository is configured so you can deploy the frontend and the backend together on Vercel. The backend is exposed as serverless functions under `/api` and reuses the aggregation logic in `backend/services`.
+
+Quick steps to deploy:
+
+1. Install and login to Vercel (optional but convenient):
+
+```bash
+npm i -g vercel
+vercel login
+```
+
+2. From the repository root, run the interactive deploy (or link the project):
+
+```bash
+vercel # follow prompts, set project root to repository root
+vercel --prod
+```
+
+What happens on Vercel:
+- Files under `api/*.js` are deployed as Node serverless functions. The included `api/rates.js` calls `backend/services/aggregator.js` so the same aggregation logic is used.
+- `frontend` is built by Vercel using the `frontend/package.json` build script (Vite) and served as static files.
+- CORS headers are set on the serverless functions to allow the frontend to call `/api/rates`.
+
+Local testing:
+
+```bash
+# run backend-like functions locally (dev server still works)
+cd frontend
+npm install
+npm run dev
+
+# You can also run the backend services locally with node
+cd backend
+npm install
+node server.js
+```
+
+If you want everything under one host (no separate backend service), use the Vercel deploy flow above. If you'd prefer a managed long-running server for the backend instead of serverless functions, consider Render or Railway and point `VITE_API_URL` to that deployed backend.
+
+
 ## ❌ What Was Intentionally Cut
 
 | Cut | Reason |
