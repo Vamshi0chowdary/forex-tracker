@@ -2,6 +2,8 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const express = require("express");
+const fs = require("fs");
+const path = require("path");
 const cors = require("cors");
 const rateRoutes = require("./routes/rates");
 const cache = require("./services/cache");
@@ -27,6 +29,18 @@ app.use(
   })
 );
 app.use(express.json());
+
+// Serve a prebuilt frontend if present at backend/public (used for single-service deploys)
+const staticPath = path.join(__dirname, "public");
+if (fs.existsSync(staticPath)) {
+  app.use(express.static(staticPath));
+
+  // SPA fallback — serve index.html for non-API routes
+  app.get("*", (req, res, next) => {
+    if (req.path.startsWith("/api") || req.path === "/health" || req.path === "/") return next();
+    return res.sendFile(path.join(staticPath, "index.html"));
+  });
+}
 
 app.get("/", (req, res) => {
   res.json({
