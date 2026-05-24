@@ -15,16 +15,33 @@ const port = Number(process.env.PORT || 5000);
 const allowedOrigins = [
   "http://localhost:5173",
   process.env.FRONTEND_URL,
+  ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : []),
 ].filter(Boolean);
 
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      // allow non-browser requests (curl, server-to-server)
+      if (!origin) return callback(null, true);
+
+      // explicit override to allow all origins (use with caution)
+      if (String(process.env.CORS_ALLOW_ALL || '').toLowerCase() === 'true') {
         return callback(null, true);
       }
 
-      return callback(new Error("CORS policy does not allow this origin"));
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      // allow Railway preview/prod domains automatically
+      try {
+        const url = new URL(origin);
+        if (url.hostname.endsWith('.railway.app')) return callback(null, true);
+      } catch (e) {
+        // fall through to deny
+      }
+
+      return callback(new Error('CORS policy does not allow this origin'));
     },
   })
 );
