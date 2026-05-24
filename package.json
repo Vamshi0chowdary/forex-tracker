@@ -1,0 +1,9 @@
+{
+  "name": "forex-tracker-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "npm --prefix frontend ci && npm --prefix frontend run build && rm -rf backend/public && mkdir -p backend/public && cp -R frontend/dist/* backend/public/ && npm --prefix backend ci",
+    "start": "node backend/server.js"
+  }
+}
