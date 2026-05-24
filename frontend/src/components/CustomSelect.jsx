@@ -22,7 +22,13 @@ function CustomSelect({ options = [], value, onChange, id, ariaLabel }) {
   useEffect(() => {
     function onDocClick(e) {
       if (!rootRef.current) return;
-      if (!rootRef.current.contains(e.target)) {
+      // If the click is inside the control, keep it open.
+      // Also ignore clicks inside the portaled list (listRef.current).
+      const target = e.target;
+      const inControl = rootRef.current && rootRef.current.contains(target);
+      const inList = listRef.current && listRef.current.contains && listRef.current.contains(target);
+
+      if (!inControl && !inList) {
         close();
       }
     }
